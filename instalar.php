@@ -242,7 +242,7 @@ function systemChecks(): array
         'required' => true,
     ];
 
-    // Extensiones
+    // Extensiones obligatorias
     foreach (['pdo_sqlite', 'sqlite3', 'fileinfo', 'xmlwriter', 'zip', 'gd'] as $ext) {
         $checks[] = [
             'group'    => 'Extensiones',
@@ -252,6 +252,15 @@ function systemChecks(): array
             'required' => true,
         ];
     }
+
+    // curl — opcional; necesaria solo para importar feeds RSS externos
+    $checks[] = [
+        'group'    => 'Extensiones',
+        'label'    => 'curl',
+        'req'      => 'Importación de feeds RSS (opcional)',
+        'ok'       => extension_loaded('curl'),
+        'required' => false,
+    ];
 
     // Apache mod_rewrite (heurística; null = no determinado)
     $mrOk = null;
@@ -842,6 +851,15 @@ $currentStep = $done ? 4 : (int)$step;
             . '</li></ul>';
     }
     ?>
+
+    <?php if (!extension_loaded('curl')): ?>
+      <div class="box warn" style="margin-top:1rem;">
+        <strong>La extensión curl no está disponible.</strong>
+        La importación de feeds RSS no estará disponible tras la instalación.
+        Puedes instalar EasyPodcast sin curl; el resto de funciones funcionará con normalidad.
+        Habilita <code>curl</code> en tu configuración de PHP si necesitas esta funcionalidad.
+      </div>
+    <?php endif; ?>
 
     <?php if ($canGo): ?>
       <div class="box ok" style="margin-top:1rem;">
